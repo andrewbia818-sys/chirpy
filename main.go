@@ -76,16 +76,17 @@ func main() {
 	//	mux.Handle("/app/", cfg.middlewareMetricsInc(
 	//		http.StripPrefix("/app/", fileServer),
 	//	))
-	mux.Handle("/app/", cfg.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))))
+	mux.Handle("/app/", cfg.middlewareMetricsInc(
+		http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))))
 
 	// /metrics endpoint
-	mux.HandleFunc("GET /metrics", cfg.handlerMetrics)
+	mux.HandleFunc("GET /api/metrics", cfg.handlerMetrics)
 
 	// /reset endpoint
-	mux.HandleFunc("POST /reset", cfg.handlerReset)
+	mux.HandleFunc("POST /api/reset", cfg.handlerReset)
 
 	// readiness endpoint
-	mux.HandleFunc("GET /healthz", handlerReadiness)
+	mux.HandleFunc("GET /api/healthz", handlerReadiness)
 
 	// Root endpoint
 	//mux.HandleFunc("/app/", func(w http.ResponseWriter, r *http.Request) {
