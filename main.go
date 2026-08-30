@@ -38,16 +38,35 @@ func handlerReadiness(w http.ResponseWriter, r *http.Request) {
 //}
 
 // /metrics handler: prints "Hits: x"
+// func (cfg *apiConfig) handlerMetrics(w http.ResponseWriter, r *http.Request) {
+//	if r.Method != http.MethodGet {
+//		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+//		return
+//	}
+//	hits := cfg.fileserverHits.Load()
+
+//		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+//		w.WriteHeader(http.StatusOK)
+//		w.Write([]byte(fmt.Sprintf("Hits: %d", hits)))
+//	}
+//
+// metrics handler: admin/metrics version
 func (cfg *apiConfig) handlerMetrics(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	hits := cfg.fileserverHits.Load()
-
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("Hits: %d", hits)))
+	w.Write([]byte(fmt.Sprintf(`
+		<html>
+  	 		<body>
+      			<h1>Welcome, Chirpy Admin</h1>
+      			<p>Chirpy has been visited %d times!</p>
+     		</body>
+    	</html>
+    	`, hits)))
 }
 
 // /reset handler: resets counter to zero
@@ -80,10 +99,11 @@ func main() {
 		http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))))
 
 	// /metrics endpoint
-	mux.HandleFunc("GET /api/metrics", cfg.handlerMetrics)
+	// mux.HandleFunc("GET /api/metrics", cfg.handlerMetrics)
+	mux.HandleFunc("GET /admin/metrics", cfg.handlerMetrics)
 
 	// /reset endpoint
-	mux.HandleFunc("POST /api/reset", cfg.handlerReset)
+	mux.HandleFunc("POST /admin/reset", cfg.handlerReset)
 
 	// readiness endpoint
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
