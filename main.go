@@ -18,16 +18,10 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// File server wrapped with middleware
-	//	fileServer := http.FileServer(http.Dir(filepathRoot))
-	//	mux.Handle("/app/", cfg.middlewareMetricsInc(
-	//		http.StripPrefix("/app/", fileServer),
-	//	))
 	mux.Handle("/app/", cfg.middlewareMetricsInc(
 		http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))))
 
 	// /metrics endpoint
-	// mux.HandleFunc("GET /api/metrics", cfg.handlerMetrics)
 	mux.HandleFunc("GET /admin/metrics", cfg.handlerMetrics)
 
 	// /reset endpoint
@@ -36,12 +30,8 @@ func main() {
 	// readiness endpoint
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
 
-	// Root endpoint
-	//mux.HandleFunc("/app/", func(w http.ResponseWriter, r *http.Request) {
-	//	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	//	w.WriteHeader(http.StatusOK)
-	//	w.Write([]byte("OK"))
-	//})
+	// validateChirp endpoint.
+	mux.HandleFunc("POST /api/validate_chirp/{rest...}", handlerValidateChirp)
 
 	srv := &http.Server{
 		Addr:    ":" + port,
