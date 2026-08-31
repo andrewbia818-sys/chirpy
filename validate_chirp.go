@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"log"
+	"strings"
 )
 
 // helper function
@@ -21,6 +22,24 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) error
 // helper function
 func respondWithError(w http.ResponseWriter, code int, msg string) error {
     return respondWithJSON(w, code, map[string]string{"error": msg})
+}
+// helper function replaceBadWords  with ****, respond with a new cleaned body
+func replaceBadWords(body string) string {
+    badWords := []string{"kerfuffle", "sharbert", "fornax"}
+
+    words := strings.Split(body, " ")
+
+    for i, w := range words {
+        lw := strings.ToLower(w)
+        for _, bad := range badWords {
+            if lw == bad {
+                words[i] = "****"
+                break
+            }
+        }
+    }
+
+    return strings.Join(words, " ")
 }
 
 func handlerValidateChirp(w http.ResponseWriter, r *http.Request) {
@@ -50,8 +69,11 @@ func handlerValidateChirp(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Success response { "valid": true }
-    respondWithJSON(w, http.StatusOK, map[string]bool{
-        "valid": true,
+    // Clean the chirp
+    cleaned := replaceBadWords(params.Body)
+
+    // Success response { "cleaned_body": cleaned }
+    respondWithJSON(w, http.StatusOK, map[string]string{
+        "cleaned_body": cleaned,
     })
 }
