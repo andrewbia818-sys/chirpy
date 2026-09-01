@@ -1,20 +1,53 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
+	"os"
 	"sync/atomic"
+	"time"
+
+	"github.com/andrewbia818-sys/chirpy/internal/database"
+	"github.com/google/uuid"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 type apiConfig struct {
 	fileserverHits atomic.Int32
+	*database.Queries
+	Platform string
+}
+type User struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Email     string    `json:"email"`
 }
 
 func main() {
+	godotenv.Load()
+	platform := os.Getenv("PLATFORM")
+
+	db, err := sql.Open("postgres", os.Getenv("DB_URL"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	queries := database.New(db)
+
+	cfg := &apiConfig{
+		Queries:  queries,
+		Platform: platform,
+	}
+
+	//}
+
 	const port = "8080"
 	const filepathRoot = "./app/"
 
-	cfg := &apiConfig{}
+	//cfg := &apiConfig{}
 
 	mux := http.NewServeMux()
 
@@ -32,6 +65,9 @@ func main() {
 
 	// validateChirp endpoint.
 	mux.HandleFunc("POST /api/validate_chirp/{rest...}", handlerValidateChirp)
+
+	// CreateUser endpoint
+	mux.HandleFunc("POST /api/users", cfg.handlerCreateUser)
 
 	srv := &http.Server{
 		Addr:    ":" + port,
