@@ -64,10 +64,25 @@ func main() {
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
 
 	// validateChirp endpoint.
-	mux.HandleFunc("POST /api/validate_chirp/{rest...}", handlerValidateChirp)
+	//mux.HandleFunc("POST /api/validate_chirp/{rest...}", handlerValidateChirp)
 
 	// CreateUser endpoint
 	mux.HandleFunc("POST /api/users", cfg.handlerCreateUser)
+
+	// Chirps endpoint
+	mux.HandleFunc("POST /api/chirps", cfg.handlerCreateChirp)
+
+	// GetChirps endpoint
+	mux.HandleFunc("GET /api/chirps", cfg.handlerGetChirps)
+
+	// GetChirp endpoint
+	//mux.HandleFunc("GET /api/chirps/{id}", cfg.handlerGetChirp)
+
+	// UpdateChirp endpoint
+	//mux.HandleFunc("PUT /api/chirps/{id}", cfg.handlerUpdateChirp)
+
+	// DeleteChirp endpoint
+	//mux.HandleFunc("DELETE /api/chirps/{id}", cfg.handlerDeleteChirp)
 
 	srv := &http.Server{
 		Addr:    ":" + port,
