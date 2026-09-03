@@ -76,7 +76,7 @@ func main() {
 	mux.HandleFunc("GET /api/chirps", cfg.handlerGetChirps)
 
 	// GetChirp endpoint
-	//mux.HandleFunc("GET /api/chirps/{id}", cfg.handlerGetChirp)
+	mux.HandleFunc("GET /api/chirps/{chirpID}", cfg.handlerGetChirp)
 
 	// UpdateChirp endpoint
 	//mux.HandleFunc("PUT /api/chirps/{id}", cfg.handlerUpdateChirp)
