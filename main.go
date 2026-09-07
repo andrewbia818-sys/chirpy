@@ -78,6 +78,9 @@ func main() {
 	// GetChirp endpoint
 	mux.HandleFunc("GET /api/chirps/{chirpID}", cfg.handlerGetChirp)
 
+	// User login endpoint
+	mux.HandleFunc("POST /api/login", cfg.handlerLogin)
+
 	// UpdateChirp endpoint
 	//mux.HandleFunc("PUT /api/chirps/{id}", cfg.handlerUpdateChirp)
 
