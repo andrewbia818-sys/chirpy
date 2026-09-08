@@ -18,6 +18,7 @@ type apiConfig struct {
 	fileserverHits atomic.Int32
 	*database.Queries
 	Platform string
+	Secret   string
 }
 type User struct {
 	ID        uuid.UUID `json:"id"`
@@ -29,6 +30,13 @@ type User struct {
 func main() {
 	godotenv.Load()
 	platform := os.Getenv("PLATFORM")
+	secret := os.Getenv("SECRET")
+	if platform == "" {
+		log.Fatal("PLATFORM environment variable is not set")
+	}
+	if secret == "" {
+		log.Fatal("SECRET environment variable is not set")
+	}
 
 	db, err := sql.Open("postgres", os.Getenv("DB_URL"))
 	if err != nil {
@@ -40,6 +48,7 @@ func main() {
 	cfg := &apiConfig{
 		Queries:  queries,
 		Platform: platform,
+		Secret:   secret,
 	}
 
 	//}
