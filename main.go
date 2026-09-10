@@ -96,11 +96,14 @@ func main() {
 	// Revoke refresh token endpoint
 	mux.HandleFunc("POST /api/revoke", cfg.handlerRevoke)
 
+	// UpdateUser endpoint
+	mux.HandleFunc("PUT /api/users", cfg.handlerUpdateUser)
+
 	// UpdateChirp endpoint
 	//mux.HandleFunc("PUT /api/chirps/{id}", cfg.handlerUpdateChirp)
 
-	// DeleteChirp endpoint
-	//mux.HandleFunc("DELETE /api/chirps/{id}", cfg.handlerDeleteChirp)
+	// DeleteChirp endpoint DELETE /api/chirps/{chirpID}
+	mux.HandleFunc("DELETE /api/chirps/{chirpID}", cfg.handlerDeleteChirp)
 
 	srv := &http.Server{
 		Addr:    ":" + port,
