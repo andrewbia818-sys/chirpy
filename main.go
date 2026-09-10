@@ -90,6 +90,12 @@ func main() {
 	// User login endpoint
 	mux.HandleFunc("POST /api/login", cfg.handlerLogin)
 
+	// Refresh token endpoint
+	mux.HandleFunc("POST /api/refresh", cfg.handlerRefresh)
+
+	// Revoke refresh token endpoint
+	mux.HandleFunc("POST /api/revoke", cfg.handlerRevoke)
+
 	// UpdateChirp endpoint
 	//mux.HandleFunc("PUT /api/chirps/{id}", cfg.handlerUpdateChirp)
 
