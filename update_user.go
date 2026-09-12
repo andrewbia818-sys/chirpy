@@ -73,9 +73,10 @@ func (cfg *apiConfig) handlerUpdateUser(w http.ResponseWriter, r *http.Request) 
 
 	// Respond with updated user (no password)
 	respondWithJSON(w, http.StatusOK, map[string]any{
-		"id":         updatedUser.ID,
-		"created_at": updatedUser.CreatedAt,
-		"updated_at": updatedUser.UpdatedAt,
-		"email":      updatedUser.Email,
+		"id":            updatedUser.ID,
+		"created_at":    updatedUser.CreatedAt,
+		"updated_at":    updatedUser.UpdatedAt,
+		"email":         updatedUser.Email,
+		"is_chirpy_red": updatedUser.IsChirpyRed,
 	})
 }

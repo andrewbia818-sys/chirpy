@@ -46,6 +46,7 @@ func main() {
 	queries := database.New(db)
 
 	cfg := &apiConfig{
+		//		Queries *database.Queries,
 		Queries:  queries,
 		Platform: platform,
 		Secret:   secret,
@@ -104,6 +105,9 @@ func main() {
 
 	// DeleteChirp endpoint DELETE /api/chirps/{chirpID}
 	mux.HandleFunc("DELETE /api/chirps/{chirpID}", cfg.handlerDeleteChirp)
+
+	// UpgradeUser endpoint POST /api/polka/webhooks
+	mux.HandleFunc("POST /api/polka/webhooks", cfg.handlerUpgradeUser)
 
 	srv := &http.Server{
 		Addr:    ":" + port,
