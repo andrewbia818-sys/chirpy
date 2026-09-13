@@ -33,6 +33,49 @@ func (cfg *apiConfig) handlerGetChirps(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Optional query parameter: author_id
+	authorIDStr := r.URL.Query().Get("author_id")
+
+	var chirps []database.Chirp
+	var err error
+
+	if authorIDStr != "" {
+		// Parse UUID
+		authorID, parseErr := uuid.Parse(authorIDStr)
+		if parseErr != nil {
+			respondWithError(w, http.StatusBadRequest, "invalid author_id")
+			return
+		}
+
+		// Query chirps for a specific author
+		chirps, err = cfg.Queries.GetChirpsByAuthor(r.Context(),
+			uuid.NullUUID{
+				UUID:  authorID,
+				Valid: true,
+			})
+	} else {
+		// Query all chirps
+		chirps, err = cfg.Queries.GetChirps(r.Context())
+	}
+
+	if err != nil {
+		log.Printf("Error getting chirps: %s", err)
+		respondWithError(w, http.StatusInternalServerError, "Could not get chirps")
+		return
+	}
+
+	resp := convertChirps(chirps)
+	respondWithJSON(w, http.StatusOK, resp)
+}
+
+/* OLD VERSOIN BELOW
+func (cfg *apiConfig) handlerGetChirps(w http.ResponseWriter, r *http.Request) {
+	log.Println("METHOD:", r.Method)
+	if r.Method != http.MethodGet {
+		respondWithError(w, http.StatusMethodNotAllowed, "method not allowed for getChirps handler")
+		return
+	}
+
 	chirps, err := cfg.GetChirps(r.Context())
 	if err != nil {
 		log.Printf("Error getting chirps: %s", err)
@@ -45,6 +88,7 @@ func (cfg *apiConfig) handlerGetChirps(w http.ResponseWriter, r *http.Request) {
 
 	respondWithJSON(w, http.StatusOK, resp)
 }
+*/
 
 // handlerGetChirp is for the GET /chirps/{chirpID} endpoint.
 func (cfg *apiConfig) handlerGetChirp(w http.ResponseWriter, r *http.Request) {

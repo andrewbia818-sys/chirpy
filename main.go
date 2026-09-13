@@ -19,6 +19,7 @@ type apiConfig struct {
 	*database.Queries
 	Platform string
 	Secret   string
+	PolkaKey string
 }
 type User struct {
 	ID        uuid.UUID `json:"id"`
@@ -50,6 +51,7 @@ func main() {
 		Queries:  queries,
 		Platform: platform,
 		Secret:   secret,
+		PolkaKey: os.Getenv("POLKA_KEY"),
 	}
 
 	//}

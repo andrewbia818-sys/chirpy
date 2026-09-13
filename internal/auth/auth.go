@@ -1,7 +1,11 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/alexedwards/argon2id"
@@ -66,3 +70,96 @@ func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
 
 	return uuid.Nil, fmt.Errorf("invalid token")
 }
+
+func GetBearerToken(headers http.Header) (string, error) {
+	authHeader := headers.Get("Authorization")
+	if authHeader == "" {
+		return "", fmt.Errorf("authorization header is missing")
+	}
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		return "", fmt.Errorf("invalid authorization header format")
+	}
+	return strings.TrimPrefix(authHeader, "Bearer "), nil
+}
+
+// Make refresh token using rand.Read to generate 32 bytes (256 bits)then use
+// hex.EncodeToString to convert to a hex string
+func MakeRefreshToken() string {
+	refresh_token_string := make([]byte, 32)
+	_, err := rand.Read(refresh_token_string)
+	if err != nil {
+		panic(err)
+	}
+	return hex.EncodeToString(refresh_token_string)
+}
+
+// Extract the api key from the Authorization header, which is expected to be in this format:
+// Authorization: ApiKey THE_KEY_HERE
+//
+//	strip out the ApiKey part and the whitespace and return just the key.
+/*
+func GetAPIKey(headers http.Header) (string, error) {
+	authHeader := headers.Get("Authorization")
+	if authHeader == "" {
+		return "", fmt.Errorf("authorization header is missing")
+	}
+
+	const prefix = "ApiKey "
+	if !strings.HasPrefix(authHeader, prefix) {
+		return "", fmt.Errorf("invalid authorization header format")
+	}
+
+	key := strings.TrimSpace(strings.TrimPrefix(authHeader, prefix))
+	if key == "" {
+		return "", fmt.Errorf("api key is empty")
+	}
+
+	return key, nil
+}
+*/
+func GetAPIKey(headers http.Header) (string, error) {
+	authHeader := headers.Get("Authorization")
+	if authHeader == "" {
+		return "", fmt.Errorf("authorization header is missing")
+	}
+
+	const prefix = "ApiKey "
+	if !strings.HasPrefix(authHeader, prefix) {
+		return "", fmt.Errorf("invalid authorization header format")
+	}
+
+	key := strings.TrimSpace(strings.TrimPrefix(authHeader, prefix))
+	if key == "" {
+		return "", fmt.Errorf("api key is empty")
+	}
+
+	return key, nil
+}
+
+/* OLD Below
+func GetAPIKey(headers http.Header) (string, error) {
+	// Boot.dev Polka webhook format
+	polkaSig := headers.Get("X-Polka-Signature")
+	if polkaSig != "" {
+		return strings.TrimSpace(polkaSig), nil
+	}
+
+	// Authorization: ApiKey <key>
+	authHeader := headers.Get("Authorization")
+	if authHeader == "" {
+		return "", fmt.Errorf("authorization header is missing")
+	}
+
+	const prefix = "ApiKey "
+	if !strings.HasPrefix(authHeader, prefix) {
+		return "", fmt.Errorf("invalid authorization header format")
+	}
+
+	key := strings.TrimSpace(strings.TrimPrefix(authHeader, prefix))
+	if key == "" {
+		return "", fmt.Errorf("api key is empty")
+	}
+
+	return key, nil
+}
+*/
